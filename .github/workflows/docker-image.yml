@@ -7,12 +7,24 @@ on:
     branches: [ "master" ]
 
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
+
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag ocr-vlm:$(date +%s)
+      run: |
+        IMAGE_TAG=ocr-vlm:$(date +%s)
+        echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+        docker build . --file Dockerfile --tag $IMAGE_TAG
+
+    - name: Save image to tarball
+      run: |
+        docker save "$IMAGE_TAG" -o image.tar
+
+    - name: Upload image artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: docker-image
+        path: image.tar
