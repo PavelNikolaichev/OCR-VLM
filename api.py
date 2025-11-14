@@ -13,6 +13,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pdf2image import convert_from_bytes
 
+from config import config
+
 # Configure logging for the module. LOG_LEVEL can be set via environment variable (e.g. DEBUG, INFO).
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
 try:
@@ -273,7 +275,18 @@ async def extract(template: UploadFile = File(...), files: List[UploadFile] = Fi
     )
 
 
+@app.get("/health", summary="Health check endpoint", response_description="Health status")
+async def health_check():
+    return JSONResponse(content={"status": "ok"})
+
+
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    logger.info(f"Starting OCR-VLM API server on {config.API_HOST}:{config.API_PORT}")
+    uvicorn.run(
+        app,
+        host=config.API_HOST,
+        port=config.API_PORT,
+        log_level=config.LOG_LEVEL.lower()
+    )

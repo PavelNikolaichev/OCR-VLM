@@ -1,0 +1,8 @@
+[browser]
+# disable usage stats (prevents first-run dialog)
+gatherUsageStats = false
+
+[server]
+headless = true
+address = "0.0.0.0"
+port = 8501
